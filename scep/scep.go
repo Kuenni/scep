@@ -193,7 +193,7 @@ type PKIMessage struct {
 	Recipients []*x509.Certificate
 
 	// Signer info
-	SignerKey  *rsa.PrivateKey
+	SignerKey  crypto.PrivateKey
 	SignerCert *x509.Certificate
 
 	logger log.Logger
@@ -340,7 +340,7 @@ func (msg *PKIMessage) parseMessageType() error {
 }
 
 // DecryptPKIEnvelope decrypts the pkcs envelopedData inside the SCEP PKIMessage
-func (msg *PKIMessage) DecryptPKIEnvelope(cert *x509.Certificate, key *rsa.PrivateKey) error {
+func (msg *PKIMessage) DecryptPKIEnvelope(cert *x509.Certificate, key /**rsa*/ *crypto.PrivateKey) error {
 	p7, err := pkcs7.Parse(msg.p7.Content)
 	if err != nil {
 		return err
@@ -388,7 +388,7 @@ func (msg *PKIMessage) DecryptPKIEnvelope(cert *x509.Certificate, key *rsa.Priva
 	}
 }
 
-func (msg *PKIMessage) Fail(crtAuth *x509.Certificate, keyAuth *rsa.PrivateKey, info FailInfo) (*PKIMessage, error) {
+func (msg *PKIMessage) Fail(crtAuth *x509.Certificate, keyAuth /**rsa*/ *crypto.PrivateKey, info FailInfo) (*PKIMessage, error) {
 	config := pkcs7.SignerInfoConfig{
 		ExtraSignedAttributes: []pkcs7.Attribute{
 			{
@@ -452,7 +452,7 @@ func (msg *PKIMessage) Fail(crtAuth *x509.Certificate, keyAuth *rsa.PrivateKey, 
 }
 
 // Success returns a new PKIMessage with CertRep data using an already-issued certificate
-func (msg *PKIMessage) Success(crtAuth *x509.Certificate, keyAuth *rsa.PrivateKey, crt *x509.Certificate) (*PKIMessage, error) {
+func (msg *PKIMessage) Success(crtAuth *x509.Certificate, keyAuth /**rsa*/ *crypto.PrivateKey, crt *x509.Certificate) (*PKIMessage, error) {
 	// check if CSRReqMessage has already been decrypted
 	if msg.CSRReqMessage.CSR == nil {
 		if err := msg.DecryptPKIEnvelope(crtAuth, keyAuth); err != nil {
@@ -581,6 +581,8 @@ func NewCSRRequest(csr *x509.CertificateRequest, tmpl *PKIMessage, opts ...Optio
 	if err != nil {
 		return nil, err
 	}
+
+	signedData.SetDigestAlgorithm(pkcs7.OIDDigestAlgorithmSHA256)
 
 	// create transaction ID from public key hash
 	tID, err := newTransactionID(csr.PublicKey)
