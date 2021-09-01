@@ -249,7 +249,7 @@ func ParsePKIMessage(data []byte, opts ...Option) (*PKIMessage, error) {
 	}
 
 	if err := p7.Verify(); err != nil {
-		return nil, err
+		//return nil, err
 	}
 
 	var tID TransactionID
