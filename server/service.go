@@ -2,7 +2,7 @@ package scepserver
 
 import (
 	"context"
-	"crypto/rsa"
+	"crypto"
 	"crypto/x509"
 	"errors"
 
@@ -38,7 +38,8 @@ type service struct {
 	// quite likely the same as the CA keypair but may be its own SCEP
 	// specific keypair in the case of e.g. RA (proxy) operation.
 	crt *x509.Certificate
-	key *rsa.PrivateKey
+	//key *rsa.PrivateKey
+	key *crypto.PrivateKey
 
 	// Optional additional CA certificates for e.g. RA (proxy) use.
 	// Only used in this service when responding to GetCACert.
@@ -119,7 +120,7 @@ func WithAddlCA(ca *x509.Certificate) ServiceOption {
 }
 
 // NewService creates a new scep service
-func NewService(crt *x509.Certificate, key *rsa.PrivateKey, signer CSRSigner, opts ...ServiceOption) (Service, error) {
+func NewService(crt *x509.Certificate, key /**rsa*/ *crypto.PrivateKey, signer CSRSigner, opts ...ServiceOption) (Service, error) {
 	s := &service{
 		crt:         crt,
 		key:         key,
