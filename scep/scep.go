@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/base64"
